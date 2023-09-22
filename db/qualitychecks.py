@@ -5,8 +5,8 @@ from mongoops import MongoOps
 
 
 # Define file paths
-schema_file = r"E:\Project\personal project\waferFaultDetection\code\WaferFaultDetection_new\schema_training.json"
-data_dir = r"E:\Project\personal project\waferFaultDetection\code\WaferFaultDetection_new\Training_Batch_Files"
+schema_file = "schema_training.json"
+data_dir = "Training_Batch_Files"
 db = MongoOps()
 
 # Load schema checks from JSON
@@ -28,9 +28,8 @@ for filename in os.listdir(data_dir):
             data.columns = list(checks['ColName'].keys())
             try:
                 data = data.astype(checks['ColName'])
-                documents = data.head(1).to_dict(orient="records")
+                documents = data.to_dict(orient="records")
                 db.add(documents)
-                break
             except ValueError as e:
                 print(f"Data type conversion error in {filename}: {e}")
         else:
