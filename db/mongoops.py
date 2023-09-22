@@ -22,6 +22,3 @@ class MongoOps:
 
     def remove(self, one=True):
         pass
-
-
-obj = MongoOps()
