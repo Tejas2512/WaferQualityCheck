@@ -2,3 +2,4 @@ db/Training_Batch_Files/
 db/cred.json
 db/__pycache__
 __pycache__
+test.py

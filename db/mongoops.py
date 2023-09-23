@@ -3,16 +3,24 @@ import json
 
 
 class MongoOps:
-    def __init__(self):
+    def __init__(self, credentials='default'):
+        # Load the credentials from the JSON file
         with open('cred.json') as file:
-            cred = json.loads(file.read())
-        uri = cred['uri']
-        client = MongoClient(uri)
-        db = client[cred['database']]
-        self.col = db[cred['collection']]
+            cred_file = json.loads(file.read())
 
-    def create(self, database=True):
-        pass
+        # Use the specified credentials or the default if not provided
+        selected_cred = cred_file.get(credentials, cred_file.get('default'))
+
+        uri = selected_cred['uri']
+        self.client = MongoClient(uri)
+        self.db = self.client[selected_cred['database']]
+        self.col = self.db[selected_cred['collection']]
+
+    def drop(self, database=True):
+        if database:
+            self.client.drop_database(self.db)
+        else:
+            self.db.drop_collection(self.col)
 
     def update(self):
         pass

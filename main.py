@@ -1,1 +1,3 @@
-print("This is main.py file") 
+from db.mongoops import MongoOps
+
+obj = MongoOps()
