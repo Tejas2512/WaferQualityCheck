@@ -3,3 +3,5 @@ db/cred.json
 db/__pycache__
 __pycache__
 test.py
+db/Invalid_Data
+db/Unittest_Batch_Files
