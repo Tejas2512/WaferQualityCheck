@@ -1,11 +1,13 @@
 from pymongo import MongoClient
 import json
+import os
 
 
 class MongoOps:
     def __init__(self, credentials='default'):
         # Load the credentials from the JSON file
-        with open('cred.json') as file:
+        file_name = os.path.abspath(os.path.join(os.path.dirname(__file__), 'cred.json'))
+        with open(file_name) as file:
             cred_file = json.loads(file.read())
 
         # Use the specified credentials or the default if not provided
@@ -33,3 +35,6 @@ class MongoOps:
 
     def fetch_data(self):
         return self.col.find()
+
+
+obj = MongoOps()
