@@ -1,30 +1,33 @@
 import pandas as pd
 import json
 import os
-from mongoops import MongoOps
+from mongoops import MongoOps  # Assuming you have a separate module for MongoOps
 
 # Define file paths
-schema_file = "schema_training.json"
-data_dir = "Training_Batch_Files"
-db = MongoOps()
-
-# Load schema checks from JSON
-with open(schema_file) as file:
-    checks = json.load(file)
+SCHEMA_FILE = "schema_training.json"
+DATA_DIR = "Training_Batch_Files"
 
 
-# Function to check the file name format
-def name_check(name):
+def load_schema_checks(schema_file):
+    """Load schema checks from a JSON file and return them as a dictionary."""
+    with open(schema_file) as file:
+        return json.load(file)
+
+
+def is_valid_filename(name, checks):
+    """Check if a filename follows the expected format."""
     parts = name.split('_')
-    return (len(parts) == 3 and
-            len(parts[1]) == checks['LengthOfDateStampInFile'] and
-            len(parts[2].split('.')[0]) == checks['LengthOfTimeStampInFile'])
+    return (
+        len(parts) == 3
+        and len(parts[1]) == checks['LengthOfDateStampInFile']
+        and len(parts[2].split('.')[0]) == checks['LengthOfTimeStampInFile']
+    )
 
 
-# Process each file in the data directory
-for filename in os.listdir(data_dir):
-    if name_check(filename):
-        data = pd.read_csv(os.path.join(data_dir, filename))
+def process_file(filename, checks, db):
+    """Process a single file."""
+    if is_valid_filename(filename, checks):
+        data = pd.read_csv(os.path.join(DATA_DIR, filename))
         if len(data.columns) == checks['NumberofColumns']:
             data.columns = list(checks['ColName'].keys())
             try:
@@ -37,3 +40,16 @@ for filename in os.listdir(data_dir):
             print(f"Column count mismatch in {filename}")
     else:
         print(f"Invalid file name format in {filename}")
+
+
+def main():
+    """Main function to process files."""
+    checks = load_schema_checks(SCHEMA_FILE)
+    db = MongoOps()
+
+    for filename in os.listdir(DATA_DIR):
+        process_file(filename, checks, db)
+
+
+if __name__ == "__main__":
+    main()

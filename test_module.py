@@ -3,52 +3,51 @@ from db.mongoops import MongoOps
 
 
 class TestMongoOps(unittest.TestCase):
-
     def setUp(self):
+        # Create an instance of MongoOps for testing with 'test' credentials
         self.mongo_obj = MongoOps(credentials='test')
 
-    # def tearDown(self):
-    #     # Drop the collection after each test
-    #     self.mongo_obj.drop(self.mongo_obj.col, database=False)
-
-    # def tearDownClass(self):
-    #     # Drop the database at the end of all tests
-    #     self.mongo_obj.drop(self.mongo_obj.db)
-
     def test_insert_data(self):
-        # Test inserting data into the collection
+        """
+        Test inserting data into the collection and check if the count matches.
+        """
+        # Prepare sample data
         documents = [{"name": "John"}, {"name": "Alice"}]
+
+        # Insert data into the collection
         self.mongo_obj.add(documents)
+
+        # Count the documents in the collection
         count = self.mongo_obj.col.count_documents({})
+
+        # Assert that the count matches the expected value
         self.assertEqual(count, 2)
 
-    # def test_update_data(self):
-    #     # Test updating data in the collection
-    #     document = {"name": "Bob"}
-    #     self.mongo_obj.add([document])
-    #     self.mongo_obj.update()
-    #     updated_document = self.mongo_obj.col.find_one({"name": "Bob"})
-    #     self.assertIsNotNone(updated_document)
-    #
-    # def test_remove_data(self):
-    #     # Test removing data from the collection
-    #     document = {"name": "Eve"}
-    #     self.mongo_obj.add([document])
-    #     self.mongo_obj.remove()
-    #     removed_document = self.mongo_obj.col.find_one({"name": "Eve"})
-    #     self.assertIsNone(removed_document)
+    def test_delete_collection(self):
+        """
+        Test deleting the collection and check if it's not in the list of collections.
+        """
+        # Delete the collection
+        self.mongo_obj.drop(database=False)
 
-    # def test_create_collection(self):
-    #     # Test creating a collection
-    #     self.mongo_obj.create(database=False)
-    #     collections = self.db.list_collection_names()
-    #     self.assertIn(self.collection_name, collections)
+        # Get the list of collections in the database
+        collections = self.mongo_obj.db.list_collection_names()
 
-    # def test_delete_collection(self):
-    #     # Test deleting a collection
-    #     self.mongo_ops.remove(one=False)
-    #     collections = self.db.list_collection_names()
-    #     self.assertNotIn(self.collection_name, collections)
+        # Assert that the collection name is not in the list of collections
+        self.assertNotIn(self.mongo_obj.col.name, collections)
+
+    def test_delete_database(self):
+        """
+        Test deleting the database and check if it's not in the list of databases.
+        """
+        # Delete the entire database
+        self.mongo_obj.drop()
+
+        # Get the list of databases in the MongoDB server
+        databases = self.mongo_obj.client.list_database_names()
+
+        # Assert that the database name is not in the list of databases
+        self.assertNotIn(self.mongo_obj.db.name, databases)
 
 
 if __name__ == '__main__':
